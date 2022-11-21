@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from docarray import DocumentArray, Document
+from docarray.array.storage.opensearch import OpenSearchConfig
 from docarray.array.storage.weaviate import WeaviateConfig
 from docarray.array.annlite import AnnliteConfig, DocumentArrayAnnlite
 from docarray.array.qdrant import QdrantConfig
@@ -30,6 +31,7 @@ def indices():
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_getter_int_str(docs, storage, config, start_storage):
@@ -64,6 +66,7 @@ def test_getter_int_str(docs, storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123)),
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_setter_int_str(docs, storage, config, start_storage):
@@ -95,6 +98,7 @@ def test_setter_int_str(docs, storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_del_int_str(docs, storage, config, start_storage, indices):
@@ -131,6 +135,7 @@ def test_del_int_str(docs, storage, config, start_storage, indices):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_slice(docs, storage, config, start_storage):
@@ -171,6 +176,7 @@ def test_slice(docs, storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_sequence_bool_index(docs, storage, config, start_storage):
@@ -219,6 +225,7 @@ def test_sequence_bool_index(docs, storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_sequence_int(docs, nparray, storage, config, start_storage):
@@ -257,6 +264,7 @@ def test_sequence_int(docs, nparray, storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_sequence_str(docs, storage, config, start_storage):
@@ -293,6 +301,7 @@ def test_sequence_str(docs, storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_docarray_list_tuple(docs, storage, config, start_storage):
@@ -315,6 +324,7 @@ def test_docarray_list_tuple(docs, storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_path_syntax_indexing(storage, config, start_storage):
@@ -356,6 +366,7 @@ def test_path_syntax_indexing(storage, config, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 @pytest.mark.parametrize('use_subindex', [False, True])
@@ -454,6 +465,7 @@ def test_path_syntax_indexing_set(storage, config, use_subindex, start_storage):
         ('qdrant', QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', ElasticConfig(n_dim=123)),
         ('redis', RedisConfig(n_dim=123)),
+        ('opensearch', OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_getset_subindex(storage, config, start_storage):
@@ -501,6 +513,7 @@ def test_getset_subindex(storage, config, start_storage):
         ('qdrant', lambda: QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', lambda: ElasticConfig(n_dim=123)),
         ('redis', lambda: RedisConfig(n_dim=123)),
+        ('opensearch', lambda: OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_attribute_indexing(storage, config_gen, start_storage, size):
@@ -541,6 +554,7 @@ def test_attribute_indexing(storage, config_gen, start_storage, size):
         ('qdrant', lambda: QdrantConfig(n_dim=10, prefer_grpc=True)),
         ('elasticsearch', lambda: ElasticConfig(n_dim=10)),
         ('redis', lambda: RedisConfig(n_dim=10)),
+        ('opensearch', lambda: OpenSearchConfig(n_dim=10)),
     ],
 )
 def test_tensor_attribute_selector(storage, config_gen, start_storage):
@@ -603,6 +617,7 @@ def test_advance_selector_mixed(storage):
         ('qdrant', lambda: QdrantConfig(n_dim=10, prefer_grpc=True)),
         ('elasticsearch', lambda: ElasticConfig(n_dim=10)),
         ('redis', lambda: RedisConfig(n_dim=10)),
+        ('opensearch', lambda: OpenSearchConfig(n_dim=10)),
     ],
 )
 def test_single_boolean_and_padding(storage, config_gen, start_storage):
@@ -637,6 +652,7 @@ def test_single_boolean_and_padding(storage, config_gen, start_storage):
         ('qdrant', lambda: QdrantConfig(n_dim=123, prefer_grpc=True)),
         ('elasticsearch', lambda: ElasticConfig(n_dim=123)),
         ('redis', lambda: RedisConfig(n_dim=123)),
+        ('opensearch', lambda: OpenSearchConfig(n_dim=123)),
     ],
 )
 def test_edge_case_two_strings(storage, config_gen, start_storage):

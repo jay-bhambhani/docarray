@@ -6,10 +6,12 @@ import pytest
 from docarray import Document, DocumentArray
 from docarray.array.elastic import DocumentArrayElastic
 from docarray.array.memory import DocumentArrayInMemory
+from docarray.array.opensearch import DocumentArrayOpenSearch
 from docarray.array.qdrant import DocumentArrayQdrant
 from docarray.array.redis import DocumentArrayRedis
 from docarray.array.sqlite import DocumentArraySqlite
 from docarray.array.storage.elastic import ElasticConfig
+from docarray.array.storage.opensearch import OpenSearchConfig
 from docarray.array.storage.qdrant import QdrantConfig
 from docarray.array.storage.redis import RedisConfig
 from docarray.array.storage.sqlite import SqliteConfig
@@ -27,6 +29,7 @@ from tests.conftest import tmpfile
         (DocumentArrayQdrant, lambda: QdrantConfig(n_dim=1)),
         (DocumentArrayElastic, lambda: ElasticConfig(n_dim=1)),
         (DocumentArrayRedis, lambda: RedisConfig(n_dim=1)),
+        (DocumentArrayOpenSearch, lambda: OpenSearchConfig(n_dim=1)),
     ],
 )
 def test_insert(da_cls, config, start_storage):
@@ -120,6 +123,7 @@ def test_context_manager_from_disk(storage, config, start_storage, tmpdir, tmpfi
         ('elasticsearch', {'n_dim': 3, 'distance': 'l2_norm'}),
         ('sqlite', dict()),
         ('redis', {'n_dim': 3, 'distance': 'L2'}),
+        ('opensearch', {'n_dim': 3, 'distance': 'l2'}),
     ],
 )
 def test_extend_subindex(storage, config):
@@ -166,6 +170,7 @@ def test_extend_subindex(storage, config):
         ('elasticsearch', {'n_dim': 3, 'distance': 'l2_norm'}),
         ('sqlite', dict()),
         ('redis', {'n_dim': 3, 'distance': 'L2'}),
+        ('opensearch', {'n_dim': 3, 'distance': 'l2'}),
     ],
 )
 def test_append_subindex(storage, config):
@@ -216,6 +221,7 @@ def embeddings_eq(emb1, emb2):
         ('elasticsearch', {'n_dim': 3, 'distance': 'l2_norm'}),
         ('sqlite', dict()),
         ('redis', {'n_dim': 3, 'distance': 'L2'}),
+        ('opensearch', {'n_dim': 3, 'distance': 'l2'}),
     ],
 )
 @pytest.mark.parametrize(
@@ -243,6 +249,7 @@ def test_del_and_append(index, storage, config):
         ('elasticsearch', {'n_dim': 3, 'distance': 'l2_norm'}),
         ('sqlite', dict()),
         ('redis', {'n_dim': 3, 'distance': 'L2'}),
+        ('opensearch', {'n_dim': 3, 'distance': 'l2'}),
     ],
 )
 @pytest.mark.parametrize(
