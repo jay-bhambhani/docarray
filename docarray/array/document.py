@@ -145,7 +145,7 @@ class DocumentArray(AllMixins, BaseDocumentArray):
     def __new__(
         cls,
         _docs: Optional['DocumentArraySourceType'] = None,
-        storage: str = 'mydocstore',
+        storage: str = 'opensearch',
         config: Optional[Union['OpenSearchConfig', Dict]] = None,
     ) -> 'DocumentArrayOpenSearch':
         """Create a MyDocStore-powered DocumentArray object."""
@@ -196,7 +196,7 @@ class DocumentArray(AllMixins, BaseDocumentArray):
 
                 instance = super().__new__(DocumentArrayRedis)
             elif storage == 'opensearch':
-                from .opensearch import DocumentArrayOpenSearch
+                from docarray.array.opensearch import DocumentArrayOpenSearch
 
                 instance = super().__new__(DocumentArrayOpenSearch)
 

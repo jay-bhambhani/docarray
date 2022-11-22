@@ -5,8 +5,6 @@ from docarray.array.storage.base.helper import Offset2ID
 from docarray import Document
 import numpy as np
 
-from docarray.typing import ArrayType
-
 
 class GetSetDelMixin(BaseGetSetDelMixin):
 
@@ -123,21 +121,3 @@ class GetSetDelMixin(BaseGetSetDelMixin):
         if doc.text:
             request['text'] = doc.text
         return request
-
-    def _map_embedding(self, embedding: ArrayType) -> List[float]:
-        from docarray.math.helper import EPSILON
-
-        if embedding is None:
-            embedding = np.zeros(self.n_dim) + EPSILON
-        else:
-            from docarray.math.ndarray import to_numpy_array
-
-            embedding = to_numpy_array(embedding)
-
-            if embedding.ndim > 1:
-                embedding = np.asarray(embedding).squeeze()
-
-        if np.all(embedding == 0):
-            embedding = embedding + EPSILON
-
-        return embedding  # .tolist()

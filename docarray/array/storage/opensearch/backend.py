@@ -17,6 +17,8 @@ from docarray.array.storage.base.backend import BaseBackendMixin, TypeMap
 from docarray import Document
 from docarray.helper import dataclass_from_dict, _safe_cast_int
 
+import numpy as np
+
 from opensearchpy import OpenSearch
 from opensearchpy.helpers import parallel_bulk
 import warnings
@@ -25,6 +27,7 @@ if TYPE_CHECKING:
     from docarray.typing import (
         DocumentArraySourceType,
     )
+    from docarray.typing import DocumentArraySourceType, ArrayType
 
 
 @dataclass
@@ -33,8 +36,8 @@ class OpenSearchConfig:
     distance: str = 'cosinesimil'  # similarity in opensearch
     hosts: Union[
         str, List[Union[str, Mapping[str, Union[str, int]]]], None
-    ] = 'http://localhost:9200'
-    index_name: Optional[str] = 'monocle_data'
+    ] = 'http://localhost:9900'
+    index_name: Optional[str] = None
     list_like: bool = True
     opensearch_config: Dict[str, Any] = field(default_factory=dict)
     index_text: bool = False
@@ -125,14 +128,14 @@ class BackendMixin(BaseBackendMixin):
 
         client = OpenSearch(
             hosts=self._config.hosts,
-            **self._config.es_config,
+            **self._config.opensearch_config,
         )
 
         schema = self._build_schema_from_elastic_config(self._config)
 
         if not client.indices.exists(index=self._config.index_name):
             client.indices.create(
-                index=self._config.index_name, mappings=schema['mappings']
+                index=self._config.index_name, body={'mappings': schema['mappings']}
             )
 
         client.indices.refresh(index=self._config.index_name)
@@ -243,3 +246,21 @@ class BackendMixin(BaseBackendMixin):
                 ]
                 self._send_requests(requests)
                 self._client.indices.refresh(index=self._index_name_offset2id)
+
+    def _map_embedding(self, embedding: 'ArrayType') -> List[float]:
+        from docarray.math.helper import EPSILON
+
+        if embedding is None:
+            embedding = np.zeros(self.n_dim) + EPSILON
+        else:
+            from docarray.math.ndarray import to_numpy_array
+
+            embedding = to_numpy_array(embedding)
+
+            if embedding.ndim > 1:
+                embedding = np.asarray(embedding).squeeze()
+
+        if np.all(embedding == 0):
+            embedding = embedding + EPSILON
+
+        return embedding  # .tolist()
