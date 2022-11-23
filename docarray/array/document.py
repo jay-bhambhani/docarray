@@ -86,6 +86,7 @@ class DocumentArray(AllMixins, BaseDocumentArray):
         subindex_configs: Optional[Dict[str, 'None']] = None,
     ) -> 'DocumentArrayInMemory':
         """Create an in-memory DocumentArray object."""
+        ...
 
     @overload
     def __new__(
@@ -148,7 +149,7 @@ class DocumentArray(AllMixins, BaseDocumentArray):
         storage: str = 'opensearch',
         config: Optional[Union['OpenSearchConfig', Dict]] = None,
     ) -> 'DocumentArrayOpenSearch':
-        """Create a MyDocStore-powered DocumentArray object."""
+        """Create an OpenSearch-powered DocumentArray object."""
         ...
 
     def __enter__(self):
