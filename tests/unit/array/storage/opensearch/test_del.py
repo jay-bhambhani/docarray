@@ -48,7 +48,8 @@ def test_delete_offset_success_sync_es_offset_index(
     for id in expected_offset_after_del:
         expected_offset = str(expected_offset_after_del.index(id))
         actual_offset_index = elastic_doc._client.search(
-            index=elastic_doc._index_name_offset2id, query={'match': {'blob': id}}
+            index=elastic_doc._index_name_offset2id,
+            body={'query': {'match': {'blob': id}}},
         )['hits']['hits'][0]['_id']
         assert actual_offset_index == expected_offset
 

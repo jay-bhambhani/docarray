@@ -47,8 +47,8 @@ class OpenSearchConfig:
     m: Optional[int] = 16
     columns: Optional[Union[List[Tuple[str, str]], Dict[str, str]]] = None
     engine: str = 'nmslib'
-    ef_search: Optional[int] = 512
-    encoder: str = 'flat'
+    ef_search: Optional[int] = None
+    encoder: Optional[str] = None
     algorithm: str = 'hnsw'
 
 
@@ -124,6 +124,32 @@ class BackendMixin(BaseBackendMixin):
             config_joined['index_name'] = unique_index_name
         return config_joined
 
+    def _build_offset2id_index(self):
+        if not self._client.indices.exists(index=self._index_name_offset2id):
+            self._client.indices.create(index=self._index_name_offset2id, ignore=[404])
+
+    def _get_offset2ids_meta(self) -> List:
+        """Return the offset2ids stored in elastic
+
+        :return: a list containing ids
+
+        :raises ValueError: error is raised if index _client is not found or no offsets are found
+        """
+        if not self._client:
+            raise ValueError('Elastic client does not exist')
+
+        n_docs = self._client.count(index=self._index_name_offset2id)["count"]
+
+        if n_docs != 0:
+            offsets = [x for x in range(n_docs)]
+            resp = self._client.mget(
+                index=self._index_name_offset2id, body={'ids': offsets}
+            )
+            ids = [x['_source']['blob'] for x in resp['docs']]
+            return ids
+        else:
+            return []
+
     def _build_client(self):
 
         client = OpenSearch(
@@ -135,7 +161,13 @@ class BackendMixin(BaseBackendMixin):
 
         if not client.indices.exists(index=self._config.index_name):
             client.indices.create(
-                index=self._config.index_name, body={'mappings': schema['mappings']}
+                index=self._config.index_name,
+                body={
+                    'settings': {
+                        'index': {'knn': True, "knn.algo_param.ef_search": 100}
+                    },
+                    'mappings': schema['mappings'],
+                },
             )
 
         client.indices.refresh(index=self._config.index_name)
@@ -155,10 +187,10 @@ class BackendMixin(BaseBackendMixin):
                             'space_type': opensearch_config.distance,
                             'engine': opensearch_config.engine,
                             'parameters': {
-                                'ef_search': opensearch_config.ef_search,
+                                #'ef_search': opensearch_config.ef_search,
                                 'ef_construction': opensearch_config.ef_construction,
                                 'm': opensearch_config.m,
-                                'encoder': opensearch_config.encoder,
+                                #'encoder': opensearch_config.encoder,
                             },
                         },
                     },
@@ -183,8 +215,8 @@ class BackendMixin(BaseBackendMixin):
             index_options = {
                 'm': self._config.m or 16,
                 'ef_construction': self._config.ef_construction or 512,
-                'ef_search': self._config.ef_search,
-                'encoder': self._config.encoder,
+                #'ef_search': self._config.ef_search,
+                #'encoder': self._config.encoder,
             }
             da_schema['mappings']['properties']['embedding']['method'][
                 'parameters'
@@ -193,6 +225,9 @@ class BackendMixin(BaseBackendMixin):
 
     def _refresh(self, index_name):
         self._client.indices.refresh(index=index_name)
+
+    def _doc_id_exists(self, doc_id):
+        return self._client.exists(index=self._config.index_name, id=doc_id)
 
     def _send_requests(self, request, **kwargs) -> List[Dict]:
         """Send bulk request to OpenSearch and gather the successful info"""
@@ -264,3 +299,12 @@ class BackendMixin(BaseBackendMixin):
             embedding = embedding + EPSILON
 
         return embedding  # .tolist()
+
+    def __getstate__(self):
+        d = dict(self.__dict__)
+        del d['_client']
+        return d
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+        self._client = self._build_client()

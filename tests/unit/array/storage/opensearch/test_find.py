@@ -24,15 +24,15 @@ def test_success_find_with_added_kwargs(start_storage, monkeypatch):
         )
 
     def _mock_knn_search(**kwargs):
-        assert kwargs['knn']['num_candidates'] == num_candidates
+        assert kwargs['body']['size'] == num_candidates
 
         return {'hits': {'hits': []}}
 
-    monkeypatch.setattr(elastic_doc._client, 'knn_search', _mock_knn_search)
+    monkeypatch.setattr(elastic_doc._client, 'search', _mock_knn_search)
 
     np_query = np.array([2, 1, 3])
 
-    elastic_doc.find(np_query, limit=10, num_candidates=num_candidates)
+    elastic_doc.find(np_query, limit=num_candidates)
 
 
 def test_filter(start_storage):
@@ -91,7 +91,6 @@ def test_filter(start_storage):
 
     with elastic_da:
         elastic_da.extend(docs)
-
     res = elastic_da.find(query=Document(embedding=docs[0].embedding))
     assert len(res) > 0
     assert res[0][0].tags['G'] == 'G0'
@@ -104,4 +103,3 @@ def test_filter(start_storage):
     res = elastic_da.find(query=Document(embedding=docs[0].embedding), filter=filter_)
     assert len(res) > 0
     assert res[0][0].tags['G'] == 'G3'
-    assert 1 == 2

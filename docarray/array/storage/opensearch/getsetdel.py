@@ -44,7 +44,7 @@ class GetSetDelMixin(BaseGetSetDelMixin):
         # Handle if doc len is more than MAX_ES_RETURNED_DOCS
         for pos in range(0, len(ids), self.MAX_ES_RETURNED_DOCS):
             es_docs = self._client.mget(
-                ids[pos : pos + self.MAX_ES_RETURNED_DOCS],
+                body={'ids': ids[pos : pos + self.MAX_ES_RETURNED_DOCS]},
                 index=self._config.index_name,
             )['docs']
             for doc in es_docs:

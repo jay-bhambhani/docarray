@@ -53,14 +53,31 @@ class FindMixin(BaseFindMixin):
         if is_all_zero:
             query = query + EPSILON
 
+        filter_query = {'match_all': {}}
+
+        if filter:
+            filter_query = {'bool': {'filter': filter}}
+
         knn_query = {
-            'size': 10000 if 'limit' not in kwargs else kwargs['limit'],
+            'size': limit,
             'query': {
-                'knn': {'embedding': {'vector': query, 'k': limit}},
-                "post_filter": filter,
+                'script_score': {
+                    'query': filter_query,
+                    'script': {
+                        'lang': 'knn',
+                        'source': 'knn_score',
+                        'params': {
+                            'field': 'embedding',
+                            'query_value': query,
+                            'space_type': kwargs.get('distance')
+                            if kwargs.get('distance')
+                            else 'cosinesimil',
+                        },
+                    },
+                }
             },
         }
-
+        print(knn_query)
         resp = self._client.search(index=self._config.index_name, body=knn_query)
         list_of_hits = resp['hits']['hits']
 
@@ -155,8 +172,9 @@ class FindMixin(BaseFindMixin):
         ]
 
     def _find_with_filter(self, query: Dict, limit: Optional[Union[int, float]] = 20):
-        query['size'] = limit
-        resp = self._client.search(index=self._config.index_name, body=query)
+        resp = self._client.search(
+            index=self._config.index_name, body={'query': query, 'size': limit}
+        )
         list_of_hits = resp['hits']['hits']
 
         da = DocumentArray()
