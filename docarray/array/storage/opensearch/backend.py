@@ -80,7 +80,7 @@ class BackendMixin(BaseBackendMixin):
     ):
         config = copy.deepcopy(config)
         if not config:
-            raise ValueError('Empty config is not allowed for Elastic storage')
+            raise ValueError('Empty config is not allowed for OpenSearch storage')
         elif isinstance(config, dict):
             config = dataclass_from_dict(OpenSearchConfig, config)
 
@@ -136,7 +136,7 @@ class BackendMixin(BaseBackendMixin):
         :raises ValueError: error is raised if index _client is not found or no offsets are found
         """
         if not self._client:
-            raise ValueError('Elastic client does not exist')
+            raise ValueError('OpenSearch client does not exist')
 
         n_docs = self._client.count(index=self._index_name_offset2id)["count"]
 
@@ -157,7 +157,7 @@ class BackendMixin(BaseBackendMixin):
             **self._config.opensearch_config,
         )
 
-        schema = self._build_schema_from_elastic_config(self._config)
+        schema = self._build_schema_from_opensearch_config(self._config)
 
         if not client.indices.exists(index=self._config.index_name):
             client.indices.create(
@@ -173,7 +173,7 @@ class BackendMixin(BaseBackendMixin):
         client.indices.refresh(index=self._config.index_name)
         return client
 
-    def _build_schema_from_elastic_config(self, opensearch_config: OpenSearchConfig):
+    def _build_schema_from_opensearch_config(self, opensearch_config: OpenSearchConfig):
         da_schema = {
             'mappings': {
                 'dynamic': 'true',
@@ -215,9 +215,11 @@ class BackendMixin(BaseBackendMixin):
             index_options = {
                 'm': self._config.m or 16,
                 'ef_construction': self._config.ef_construction or 512,
-                #'ef_search': self._config.ef_search,
-                #'encoder': self._config.encoder,
             }
+            if self._config.ef_search:
+                index_options['ef_search'] = self._config.ef_search
+            if self._config.encoder:
+                index_options['encoder'] = self._config.encoder
             da_schema['mappings']['properties']['embedding']['method'][
                 'parameters'
             ] = index_options
@@ -298,7 +300,7 @@ class BackendMixin(BaseBackendMixin):
         if np.all(embedding == 0):
             embedding = embedding + EPSILON
 
-        return embedding  # .tolist()
+        return embedding
 
     def __getstate__(self):
         d = dict(self.__dict__)
