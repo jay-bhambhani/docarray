@@ -78,6 +78,9 @@ setup(
         'elasticsearch': [
             'elasticsearch>=8.2.0',
         ],
+        'opensearch': [
+            'opensearch-py==2.0.0',
+        ],
         'redis': [
             'redis>=4.3.0',
         ],
