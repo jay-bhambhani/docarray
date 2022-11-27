@@ -84,6 +84,9 @@ setup(
         'redis': [
             'redis>=4.3.0',
         ],
+        'milvus': [
+            'pymilvus~=2.1.0',
+        ],
         'benchmark': [
             'pandas',
             'matplotlib',
@@ -114,7 +117,9 @@ setup(
             'annlite',
             'elasticsearch>=8.2.0',
             'redis>=4.3.0',
+            'pymilvus==2.1.3',
             'jina',
+            'pytest-mock',
         ],
     },
     classifiers=[
