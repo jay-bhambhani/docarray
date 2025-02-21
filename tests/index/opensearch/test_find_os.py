@@ -6,10 +6,10 @@ from pydantic import Field
 from docarray import BaseDoc
 from docarray.index import OpenSearchDocIndex
 from docarray.typing import NdArray, TorchTensor
-from tests.index.elastic.fixture import (  # noqa: F401
+from tests.index.opensearch.fixture import (  # noqa: F401
     FlatDoc,
     SimpleDoc,
-    start_storage_v8,
+    start_storage,
     tmp_index_name,
 )
 

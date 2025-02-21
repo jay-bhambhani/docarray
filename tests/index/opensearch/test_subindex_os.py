@@ -5,7 +5,7 @@ from pydantic import Field
 from docarray import BaseDoc, DocList
 from docarray.index import OpenSearchDocIndex
 from docarray.typing import NdArray
-from tests.index.elastic.fixture import start_storage_v8  # noqa: F401
+from tests.index.opensearch.fixture import start_storage  # noqa: F401
 
 pytestmark = [pytest.mark.slow, pytest.mark.index, pytest.mark.elasticv8]
 

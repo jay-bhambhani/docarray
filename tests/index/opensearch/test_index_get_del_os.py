@@ -7,13 +7,13 @@ from docarray import BaseDoc, DocList
 from docarray.documents import TextDoc
 from docarray.index import OpenSearchDocIndex
 from docarray.typing import NdArray
-from tests.index.elastic.fixture import (  # noqa: F401
+from tests.index.opensearch.fixture import (  # noqa: F401
     DeepNestedDoc,
     FlatDoc,
     MyImageDoc,
     NestedDoc,
     SimpleDoc,
-    start_storage_v8,
+    start_storage,
     ten_deep_nested_docs,
     ten_flat_docs,
     ten_nested_docs,
