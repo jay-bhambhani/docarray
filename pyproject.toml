@@ -168,4 +168,5 @@ markers = [
     "elasticv8: marks test that run with ElasticSearch v8",
     "jac: need to have access to jac cloud",
     "atlas: mark tests using MongoDB Atlas",
+    "opensearchv2: mark tests using OpenSearchV2",
 ]
