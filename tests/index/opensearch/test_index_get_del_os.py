@@ -21,10 +21,9 @@ from tests.index.opensearch.fixture import (  # noqa: F401
     tmp_index_name,
 )
 
-pytestmark = [pytest.mark.slow, pytest.mark.index, pytest.mark.elasticv8]
+pytestmark = [pytest.mark.slow, pytest.mark.index, pytest.mark.opensearchv2]
 
 
-@pytest.mark.parametrize('use_docarray', [True, False])
 def test_index_simple_schema(
     ten_simple_docs, use_docarray, tmp_index_name  # noqa: F811
 ):

@@ -36,8 +36,8 @@ def start_storage():
     os.system(f"docker compose -f {compose_yml} up -d --remove-orphans")
     _wait_for_os()
 
-    # yield
-    # os.system(f"docker compose -f {compose_yml} down --remove-orphans")
+    yield
+    os.system(f"docker compose -f {compose_yml} down --remove-orphans")
 
 
 def _wait_for_os():

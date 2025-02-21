@@ -13,7 +13,7 @@ from tests.index.opensearch.fixture import (  # noqa: F401
     tmp_index_name,
 )
 
-pytestmark = [pytest.mark.slow, pytest.mark.index, pytest.mark.elasticv8]
+pytestmark = [pytest.mark.slow, pytest.mark.index, pytest.mark.opensearchv2]
 
 
 @pytest.mark.parametrize('similarity', ['cosine', 'l2_norm', 'dot_product'])

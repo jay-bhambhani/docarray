@@ -7,7 +7,7 @@ from docarray.index import OpenSearchDocIndex
 from docarray.typing import NdArray
 from tests.index.opensearch.fixture import start_storage  # noqa: F401
 
-pytestmark = [pytest.mark.slow, pytest.mark.index, pytest.mark.elasticv8]
+pytestmark = [pytest.mark.slow, pytest.mark.index, pytest.mark.opensearchv2]
 
 
 class SimpleDoc(BaseDoc):
