@@ -163,10 +163,6 @@ class OpenSearchDocIndex(BaseDocIndex, Generic[TSchema]):
 
             if len(self._query['query']) == 0:
                 del self._query['query']
-            elif 'knn' in self._query:
-                self._query['knn']['filter'] = self._query['query']
-                del self._query['query']
-
             return self._query
 
         def find(
@@ -191,15 +187,11 @@ class OpenSearchDocIndex(BaseDocIndex, Generic[TSchema]):
             else:
                 query_vec = query
             query_vec_np = BaseDocIndex._to_numpy(self._outer_instance, query_vec)
-            self._query['query']['bool']['must'].append(
-                {
-                    'knn': self._outer_instance._form_search_body(
-                        query_vec_np,
-                        search_field,
-                        limit,
-                    )['query']['knn']
-                }
-            )
+            self._query['query']['knn'] = self._outer_instance._form_search_body(
+                query_vec_np,
+                search_field,
+                limit,
+            )['query']['knn']
             self._query['size'] = limit
 
             return self
@@ -216,7 +208,22 @@ class OpenSearchDocIndex(BaseDocIndex, Generic[TSchema]):
             self._outer_instance._logger.debug('Executing filter query')
 
             self._query['size'] = limit
-            self._query['query']['bool']['filter'].append(query)
+            if self._query['query'].get('knn'):
+                search_field = next(iter(self._query['query']['knn']))
+                if self._query['query']['knn'][search_field].get('filter') is not None:
+                    self._query['query']['knn'][search_field]['filter']['bool'][
+                        'must'
+                    ].append(query)
+                else:
+                    self._query['query']['knn'][search_field]['filter'] = {}
+                    self._query['query']['knn'][search_field]['filter']['bool'] = {
+                        'must': []
+                    }
+                    self._query['query']['knn'][search_field]['filter']['bool'][
+                        'must'
+                    ].append(query)
+            else:
+                self._query['query']['bool']['filter'].append(query)
             return self
 
         def text_search(self, query: str, search_field: str = 'text', limit: int = 10):
@@ -231,9 +238,24 @@ class OpenSearchDocIndex(BaseDocIndex, Generic[TSchema]):
 
             self._outer_instance._validate_search_field(search_field)
             self._query['size'] = limit
-            self._query['query']['bool']['must'].append(
-                {'match': {search_field: query}}
-            )
+            if self._query['query'].get('knn'):
+                vector_field = next(iter(self._query['query']['knn']))
+                if self._query['query']['knn'][vector_field].get('filter') is not None:
+                    self._query['query']['knn'][vector_field]['filter']['bool'][
+                        'must'
+                    ].append({'term': {search_field: query}})
+                else:
+                    self._query['query']['knn'][vector_field]['filter'] = {}
+                    self._query['query']['knn'][vector_field]['filter']['bool'] = {
+                        'must': []
+                    }
+                    self._query['query']['knn'][vector_field]['filter']['bool'][
+                        'must'
+                    ].append({'term': {search_field: query}})
+            else:
+                self._query['query']['bool']['must'].append(
+                    {'match': {search_field: query}}
+                )
             return self
 
         find_batched = _raise_not_composable('find_batched')

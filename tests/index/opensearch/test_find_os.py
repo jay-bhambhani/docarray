@@ -306,44 +306,41 @@ def test_query_builder():
     # combination
     q = (
         index.build_query()
-        .filter({'range': {'num': {'lte': 3}}})
         .find(index_docs[-1], search_field='tens')
+        .filter({'range': {'num': {'lte': 3}}})
         .text_search('0', search_field='text')
         .build()
     )
-    print('Q', q)
     docs, _ = index.execute_query(q)
-    assert [doc['id'] for doc in docs] == ['0', '1']
+    assert [doc['id'] for doc in docs] == ['1', '0']
 
     # direct
     query = {
         'query': {
-            'bool': {
-                'filter': [
-                    {'range': {'num': {'gte': 2}}},
-                    {'range': {'num': {'lte': 3}}},
-                ],
-                'must': [
-                    {
-                        'knn': {
-                            'tens': {
-                                'vector': [
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                    9.0,
-                                ],
-                                'k': 10,
-                            }
+            'knn': {
+                'tens': {
+                    'vector': [
+                        9.0,
+                        9.0,
+                        9.0,
+                        9.0,
+                        9.0,
+                        9.0,
+                        9.0,
+                        9.0,
+                        9.0,
+                        9.0,
+                    ],
+                    'k': 10,
+                    'filter': {
+                        'bool': {
+                            'must': [
+                                {'range': {'num': {'gte': 2}}},
+                                {'range': {'num': {'lte': 3}}},
+                            ]
                         }
-                    }
-                ],
+                    },
+                },
             }
         }
     }
